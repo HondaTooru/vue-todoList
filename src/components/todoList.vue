@@ -46,7 +46,7 @@ let filters = {
   }
 }
 export default {
-  name: 'HelloWorld',
+  name: 'todoList',
   data () {
     return {
       newTodo: '',
