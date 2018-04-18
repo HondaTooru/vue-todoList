@@ -3,13 +3,15 @@
     <div class="img">
     <img src="./assets/logo.png">
   </div>
-    <router-view/>
+   <todo-list></todo-list>
   </div>
 </template>
 
 <script>
+import TodoList from '@/components/todoList'
 export default {
   name: 'App',
+  components: {'todo-list': TodoList},
   data () {
     return {
       msg: 'fail tail'

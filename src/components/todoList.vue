@@ -25,9 +25,9 @@
     <footer v-if='TodoList.length'>
       <span class="todo-count">{{remainin}} item left</span>
       <ul>
-        <li :class="{selected: visibility == 'All'}" @click="visibility= 'All'">All</li>
-        <li :class="{selected: visibility == 'Active'}" @click="visibility= 'Active'">Active</li>
-        <li :class="{selected: visibility == 'Completed'}" @click="visibility= 'Completed'">Complete</li>
+        <li :class="{selected: visibility == 'All'}"><a href="#/All">All</a></li>
+        <li :class="{selected: visibility == 'Active'}"><a href="#/Active">Active</a></li>
+        <li :class="{selected: visibility == 'Completed'}"><a href="#/Complete">Complete</a></li>
       </ul>
       <button class="clear-completed" @click="removeCompleted" v-if="TodoList.length > remainin">Clear Completed</button>
     </footer>
@@ -286,6 +286,7 @@ input,button{outline: 0 none;border: none; background:none;appearance:none;}
         border: 1px solid transparent;
         cursor: pointer;
         padding: 3px 7px;
+        a{color:#777;text-decoration: none;}
         &.selected {
           border-color: rgba(175,47,47,0.2)
         }
