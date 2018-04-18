@@ -27,7 +27,7 @@
       <ul>
         <li :class="{selected: visibility == 'All'}"><a href="#/All">All</a></li>
         <li :class="{selected: visibility == 'Active'}"><a href="#/Active">Active</a></li>
-        <li :class="{selected: visibility == 'Completed'}"><a href="#/Complete">Complete</a></li>
+        <li :class="{selected: visibility == 'Completed'}"><a href="#/Completed">Completed</a></li>
       </ul>
       <button class="clear-completed" @click="removeCompleted" v-if="TodoList.length > remainin">Clear Completed</button>
     </footer>
@@ -50,9 +50,21 @@ export default {
   data () {
     return {
       newTodo: '',
-      TodoList: [],
+      TodoList: this.todoStorage().fetch(),
       editedTodo: null,
       visibility: 'All'
+    }
+  },
+  mounted () {
+    window.addEventListener('hashchange', this.onHashCHange)
+    this.onHashCHange()
+  },
+  watch: {
+    TodoList: {
+      handler (TodoList) {
+        this.todoStorage().save(TodoList)
+      },
+      deep: true
     }
   },
   methods: {
@@ -62,6 +74,7 @@ export default {
         return
       }
       this.TodoList.unshift({
+        id: this.todoStorage().uid(),
         item: this.newTodo,
         isFinished: false
       })
@@ -90,6 +103,34 @@ export default {
     cancelTodo (todo) {
       todo.item = this.beforeTitle
       this.editedTodo = null
+    },
+    onHashCHange () {
+      let visible = window.location.hash.replace(/#\/?/, '')
+      if (filters[visible]) {
+        this.visibility = visible
+      } else {
+        window.location.hash = ''
+        this.visibility = 'All'
+      }
+    },
+    todoStorage () {
+      let STORAGE_KEY = 'todosList-vuejs-2.0'
+      let todostorage = {
+        fetch () {
+          let todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+          todos.forEach(function (todo, index) {
+            todo.id = index
+          })
+          return todos
+        },
+        uid () {
+          return this.fetch().length
+        },
+        save (todos) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
+        }
+      }
+      return todostorage
     }
   },
   computed: {
