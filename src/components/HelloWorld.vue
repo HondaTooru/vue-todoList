@@ -1,18 +1,24 @@
 <template>
   <div class="todoapp">
     <header>
-      <input type="checkbox"  v-if="TodoList.length">
+      <input type="checkbox"  v-if="TodoList.length" v-model="allDone">
       <input placeholder="what needs to be done?" name="newTodo" type="text" @keyup.enter="addTodo" v-model="newTodo">
     </header>
     <section class="main">
       <ul class="todo-list">
-        <li :class="{completed: todo.isFinished}" v-for="todo in filterTodoList" :key="todo.id">
+        <li :class="{completed: todo.isFinished, edited: todo === editedTodo}" v-for="todo in filterTodoList" :key="todo.id">
            <div class="view">
              <input type="checkbox" v-model="todo.isFinished">
-             <label>{{todo.item}}</label>
+             <label @dblclick="editTodo(todo)">{{todo.item}}</label>
              <button @click="removeTodo(todo)"></button>
            </div>
-           <input type="text" class="edit">
+           <input type="text" class="edit"
+           v-model="todo.item"
+           v-todo-foucs="todo == editedTodo"
+           @blur="doneTodo(todo)"
+           @keyup.enter="doneTodo(todo)"
+           @keyup.esc="cancelTodo(todo)"
+           >
         </li>
       </ul>
     </section>
@@ -23,7 +29,7 @@
         <li :class="{selected: visibility == 'Active'}" @click="visibility= 'Active'">Active</li>
         <li :class="{selected: visibility == 'Completed'}" @click="visibility= 'Completed'">Complete</li>
       </ul>
-      <button class="clear-completed">Clear Completed</button>
+      <button class="clear-completed" @click="removeCompleted" v-if="TodoList.length > remainin">Clear Completed</button>
     </footer>
   </div>
 </template>
@@ -45,6 +51,7 @@ export default {
     return {
       newTodo: '',
       TodoList: [],
+      editedTodo: null,
       visibility: 'All'
     }
   },
@@ -62,6 +69,27 @@ export default {
     },
     removeTodo (todo) {
       this.TodoList.splice(this.TodoList.indexOf(todo), 1)
+    },
+    removeCompleted () {
+      this.TodoList = filters.Active(this.TodoList)
+    },
+    editTodo (todo) {
+      this.beforeTitle = todo.item
+      this.editedTodo = todo
+    },
+    doneTodo (todo) {
+      if (this.editedTodo) {
+        this.editedTodo = null
+        todo.item = todo.item.trim()
+        if (!todo.item) {
+          this.removeTodo(todo)
+        }
+      }
+      this.editedTodo = null
+    },
+    cancelTodo (todo) {
+      todo.item = this.beforeTitle
+      this.editedTodo = null
     }
   },
   computed: {
@@ -70,6 +98,23 @@ export default {
     },
     remainin: function () {
       return filters.Active(this.TodoList).length
+    },
+    allDone: {
+      get () {
+        return this.remainin === 0
+      },
+      set (value) {
+        this.TodoList.map(function (todo) {
+          todo.isFinished = value
+        })
+      }
+    }
+  },
+  directives: {
+    'todo-foucs': function (el, binding) {
+      if (binding.value) {
+        el.focus()
+      }
     }
   }
 }
@@ -147,6 +192,10 @@ input,button{outline: 0 none;border: none; background:none;appearance:none;}
             text-decoration: line-through;
           }
         }
+        &.edited {
+          .view{display: none;}
+          .edit{display: block;}
+        }
         &:hover {
           .view {
             button {
@@ -181,18 +230,23 @@ input,button{outline: 0 none;border: none; background:none;appearance:none;}
               content: url(../assets/btn.svg)
             }
           }
-          label {
-            white-space: pre-line;
-            word-break: break-all;
-            padding: 15px 60px 15px 15px;
-            margin-left: 45px;
-            display: block;
-            line-height: 1.2;
-            transition: color 0.4s;
-          }
+        }
+        label, .edit {
+          white-space: pre-line;
+          word-break: break-all;
+          padding: 15px 60px 15px 15px;
+          margin-left: 45px;
+          display: block;
+          line-height: 1.2;
+          transition: color 0.4s;
+          font-size: 24px;
+          color:#4d4d4d;
         }
         input.edit {
           display: none;
+          width: 505px;
+          box-sizing: border-box;
+          box-shadow: inset 0 0 4px 0px #ababab;
         }
       }
     }
