@@ -1,6 +1,6 @@
 # vue01
 
-> A Vue.js project
+> A Vue.js TodoList project
 
 ## Build Setup
 
@@ -25,4 +25,4 @@ npm test
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
-"# vue-todoList" 
+"# vue-todoList"
